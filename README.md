@@ -38,6 +38,51 @@ Les étapes ci-dessus sont appliquées à tous les blocs composant les MCUs de l
 Les opérations de codage/décodage sont résumées sur la figure ci-dessous, puis détaillées dans les sections suivantes (dans le sens du décodage). L'annexe A fournit un exemple numérique du codage d'une MCU.
 
 
+## 2.2 Représentation des données
+
+Il existe plusieurs manières de représenter une image. Une image numérique est en fait un tableau de pixels, chaque pixel ayant une couleur distincte. Dans le domaine spatial, le codec utilise deux types de représentation de l'image.
+
+Le format RGB, le plus courant, est le format utilisé en entrée. Il représente chaque couleur de pixel en donnant la proportion de trois couleurs primitives: le rouge (R), le vert (G), et le bleu (B). Une information de transparence alpha (A) peut également être fournie (on parle alors de ARGB), mais elle ne sera pas utilisée dans ce projet. Le format RGB est le format utilisé en amont et en aval de l'encodeur.
+
+Un deuxième format, appelé YCbCr, utilise une autre stratégie de représentation, en trois composantes: une luminance dite Y, une différence de chrominance bleue dite Cb, et une différence de chrominance rouge dite Cr. Le format YCbCr est le format utilisé en interne par la norme JPEG. Une confusion est souvent réalisée entre le format YCbCr et le format YUV.4
+
+La stratégie de représentation YCbCr est plus efficace que le RGB (Red, Green, Blue) classique, car d'une part les différences sont codées sur moins de bits que les valeurs et d'autre part elle permet des approximations (ou de la perte) sur la chrominance à laquelle l'œil humain est moins sensible.
+
+## 2.3 Découpage de l'image en MCUs
+
+## 2.4 Conversion RGB vers YCbCr
+
+## 2.5 Compression des MCUs
+##   ----------------------
+    **2.5.1 Sous-échantillonnage de l'image**
+    **2.5.2 Ordre d'écriture des blocs**
+
+
+## 2.6 Transformée en cosinus discrète (DCT)
+
+
+
+## 2.7 Quantification et zig-zag
+    **2.7.1 Zig-zag**
+    **2.7.2 Quantification**
+    **2.7.3 Ordre des opérations**
+
+
+## 2.8 Compression d'un bloc fréquentiel
+    **2.8.1 Le codage de Huffman**
+    **2.8.2 Coefficient continu: DPCM, magnitude et arbre DC**
+        **2.8.2.1 Représentation par magnitude**
+        **2.8.2.2 Encodage dans le flux de bits: Huffman**
+    **2.8.3 Arbres AC et codage RLE**
+        **2.8.3.1 Codage des coefficients AC**
+        **2.8.3.2 Encodage dans le flux**
+
+
+## 2.9 Ecriture dans le flux JPEG
+    **2.9.1 Structure d'un fichier JPEG**
+    **2.9.2 Byte stuffing**
+
+
 
 # struct HEADER
 

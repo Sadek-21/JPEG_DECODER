@@ -1,5 +1,9 @@
 # Ensimag - Printemps 2024 - Projet Logiciel en C
 ### Sujet : Encodeur JPEG
+
+![Alt text](./shaun_masque.jpg "HEADER struct")
+
+
 ### Auteurs : Des enseignants actuels et antérieurs du projet C
 
 ## 1. Introduction

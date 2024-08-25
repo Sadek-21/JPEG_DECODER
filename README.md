@@ -66,32 +66,30 @@ La figure ci-dessus donne un exemple d’une image 46 × 35 (fond gris) à compr
 
 La conversion RGB vers YCbCr s'effectue pixel par pixel à partir des trois composantes de chaque MCU (éventuellement composée de plusieurs blocs, voir ensuite). Ainsi, pour chaque pixel dans l'espace RGB, on effectue le calcul suivant pour obtenir la valeur du pixel dans l'espace YCbCr :
 
-<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
-  <mi>C</mi>
-  <mi>b</mi>
-  <mo>=</mo>
-  <mo>&#x2212;<!-- − --></mo>
-  <mn>0.1687</mn>
-  <mo>&#x00D7;<!-- × --></mo>
-  <mi>R</mi>
-  <mo>&#x2212;<!-- − --></mo>
-  <mn>0.3313</mn>
-  <mo>&#x00D7;<!-- × --></mo>
-  <mi>G</mi>
-  <mo>+</mo>
-  <mn>0.5</mn>
-  <mo>&#x00D7;<!-- × --></mo>
-  <mi>B</mi>
-  <mo>+</mo>
-  <mn>128</mn>
-</math>
+![Alt text](./mat.png "HEADER struct")
 
 Ces calculs incluent des opérations arithmétiques sur des valeurs flottantes et signées. Sachant que les valeurs RGB sont forcément comprises entre 0 et 255, il conviendra de choisir le plus petit type de données entier permettant d'encoder toute la plage de valeurs possibles pour Y, Cb et Cr lors de l'écriture de votre encodeur.
 
 ## 2.5 Compression des MCUs
 ##   ----------------------
+Dans le processus de compression, le JPEG peut exploiter la faible sensibilité de l'œil humain aux composantes de chrominance pour réaliser un sous-échantillonnage (subsampling) de l'image.
+
+Le sous-échantillonnage est une technique de compression qui consiste en une diminution du nombre de valeurs, appelées échantillons, pour certaines composantes de l'image. Pour prendre un exemple, imaginons qu'on travaille sur une image couleur YCbCr partitionnée en MCUs de 2x2 blocs de 8x8 pixels chacun, pour un total de 256 pixels.
+
+Ces 256 pixels ont chacun un échantillon pour chaque composante, le stockage nécessiterait donc 256x3 = 768 échantillons. On ne sous-échantillonne jamais la composante de luminance de l'image. En effet, l'œil humain est extrêmement sensible à cette information, et une modification impacterait trop la qualité perçue de l'image. Cependant, comme on l'a dit, la chrominance contient moins d'information. On pourrait donc décider que pour 2 pixels de l'image consécutifs horizontalement, un seul échantillon par composante de chrominance suffit. Il faudrait seulement alors 256 + 128 + 128 = 512 échantillons pour représenter toutes les composantes, ce qui réduit notablement la place occupée! Si on applique le même raisonnement sur les pixels de l'image consécutifs verticalement, on se retrouve à associer à 4 pixels un seul échantillon par chrominance, et on tombe à une occupation mémoire de 256 + 64 + 64 = 384 échantillons.
     **2.5.1 Sous-échantillonnage de l'image**
+    Dans ce document, nous utiliserons une notation directement en lien avec les valeurs présentes dans les sections JPEG de l'en-tête, décrites en annexe B, qui déterminent le facteurs d'échantillonnages (sampling factors). Ces valeurs sont identiques partout dans une image. En pratique, on utilisera la notation \(h\times v)\ de la forme :
+
+![Alt text](./mat1.png "HEADER struct")
+
+    où hi et Vi représentent le nombre de blocs horizontaux et verticaux pour la composante i. Comme Y n'est jamais compressé, le facteur d'échantillonnage de Y donne les dimensions de la MCU en nombre de blocs. Les sous-échantillonnages les plus courants sont décrits ci-dessous. Votre encodeur devra supporter au moins ces trois combinaisons, mais nous vous encourageons à gérer tous les cas !
+
+![Alt text](./sousech.png "HEADER struct")
+
+    La figure ci-dessus illustre les composantes Y, Cb et Cr avec et sans sous-échantillonnage, pour une MCU de 2 × 2 blocs.
+
     **2.5.2 Ordre d'écriture des blocs**
+    
 
 
 ## 2.6 Transformée en cosinus discrète (DCT)
@@ -117,18 +115,17 @@ Ces calculs incluent des opérations arithmétiques sur des valeurs flottantes e
 ## 2.9 Ecriture dans le flux JPEG
     **2.9.1 Structure d'un fichier JPEG**
     **2.9.2 Byte stuffing**
+    
 
 
 
-# struct HEADER
 
-![Alt text](./HeaderStruct.png "HEADER struct")
 
-# struct group_MCU/group_RGB
+![Alt text](./ordo.png "HEADER struct")
 
-![Alt text](./groupMCU_RGB.png "group_MCU / group_RGB struct")
+![Alt text](./ordo1c.png "group_MCU / group_RGB struct")
 
-# architecture
+![Alt text](./zig_then_zag.jpg "Architecture")
 
-![Alt text](./Architecture.jpg "Architecture")
+![Alt text](./huff.png "Architecture")
 

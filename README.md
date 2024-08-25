@@ -41,6 +41,7 @@ Les étapes ci-dessus sont appliquées à tous les blocs composant les MCUs de l
 
 Les opérations de codage/décodage sont résumées sur la figure ci-dessous, puis détaillées dans les sections suivantes (dans le sens du décodage). L'annexe A fournit un exemple numérique du codage d'une MCU.
 
+![Alt text](./codec.png "HEADER struct")
 
 ## 2.2 Représentation des données
 
@@ -53,8 +54,39 @@ Un deuxième format, appelé YCbCr, utilise une autre stratégie de représentat
 La stratégie de représentation YCbCr est plus efficace que le RGB (Red, Green, Blue) classique, car d'une part les différences sont codées sur moins de bits que les valeurs et d'autre part elle permet des approximations (ou de la perte) sur la chrominance à laquelle l'œil humain est moins sensible.
 
 ## 2.3 Découpage de l'image en MCUs
+La première étape consiste à découper l'image en MCUs.
+
+La taille de l'image n'étant par forcément un multiple de la taille des MCUs, le découpage en MCUs peut "déborder" à droite et en bas. A l'encodage, la norme recommande de compléter les MCUs en dupliquant la dernière colonne (respectivement ligne) contenue dans l'image dans les colonnes (respectivement lignes) en trop.
+
+![Alt text](./mcu.png "HEADER struct")
+
+La figure ci-dessus donne un exemple d’une image 46 × 35 (fond gris) à compresser sans sous-échantillonnage, soit avec des MCUs composées d’un seul bloc 8 × 8. Pour couvrir l’image en entier, 6 × 5 MCUs sont nécessaires. Les MCUs les plus à droite et en bas (les 6e, 12e, 18e, puis 24e à 30e) devront être complétées lors de la compression.
 
 ## 2.4 Conversion RGB vers YCbCr
+
+La conversion RGB vers YCbCr s'effectue pixel par pixel à partir des trois composantes de chaque MCU (éventuellement composée de plusieurs blocs, voir ensuite). Ainsi, pour chaque pixel dans l'espace RGB, on effectue le calcul suivant pour obtenir la valeur du pixel dans l'espace YCbCr :
+
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>C</mi>
+  <mi>b</mi>
+  <mo>=</mo>
+  <mo>&#x2212;<!-- − --></mo>
+  <mn>0.1687</mn>
+  <mo>&#x00D7;<!-- × --></mo>
+  <mi>R</mi>
+  <mo>&#x2212;<!-- − --></mo>
+  <mn>0.3313</mn>
+  <mo>&#x00D7;<!-- × --></mo>
+  <mi>G</mi>
+  <mo>+</mo>
+  <mn>0.5</mn>
+  <mo>&#x00D7;<!-- × --></mo>
+  <mi>B</mi>
+  <mo>+</mo>
+  <mn>128</mn>
+</math>
+
+Ces calculs incluent des opérations arithmétiques sur des valeurs flottantes et signées. Sachant que les valeurs RGB sont forcément comprises entre 0 et 255, il conviendra de choisir le plus petit type de données entier permettant d'encoder toute la plage de valeurs possibles pour Y, Cb et Cr lors de l'écriture de votre encodeur.
 
 ## 2.5 Compression des MCUs
 ##   ----------------------
